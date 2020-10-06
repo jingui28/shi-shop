@@ -6,6 +6,7 @@ router.get('/', function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
+<<<<<<< HEAD
 router.post('/register', function(req, res, next) {
   const {username, password} = req.body
   console.log('register', username, password)
@@ -15,5 +16,16 @@ router.post('/register', function(req, res, next) {
     res.send({code: 0, data: {_id: 'abc', username, password}})
   }
 });
+=======
+router.post('/register', function (req, res, next) {
+  const {username, password} = req.body
+  console.log('register', username, password)
+  if (username === 'admin') {
+  res.send({code: 1, msg: '此用户已存在'})
+  } else {
+  res.send({code: 0, data: {_id: 'abc', username, password}})
+  }
+})
+>>>>>>> server
 
 module.exports = router;
