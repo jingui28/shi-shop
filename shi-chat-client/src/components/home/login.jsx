@@ -10,10 +10,13 @@ import {
     WhiteSpace,
     Button
 } from 'antd-mobile'
+import { connect } from "react-redux";
 
 import Logo from './logo'
+import { login } from "../../redux/actions";
+import { Redirect } from 'react-router-dom';
 
-export default class Register extends Component {
+class Login extends Component {
     state = {
         username: '',
         password: ''
@@ -28,11 +31,14 @@ export default class Register extends Component {
     }
     // 注册
     login = () => {
-        console.log(JSON.stringify(this.state))
+        this.props.login(this.state)
     }
 
     render() {
-        const {type} = this.state
+        const {redirectTo, msg} = this.props
+        if (redirectTo) {
+            return <Redirect to={redirectTo} />
+        }
         return (
             <div>
                 <NavBar>直&nbsp;聘&nbsp;聊&nbsp;天</NavBar>
@@ -40,6 +46,7 @@ export default class Register extends Component {
                 <Logo></Logo>
                 </div>
                 
+                {msg? <p className='error-msg'>{msg}</p> : null}
                 <WingBlank>
                 <List>
                 <InputItem
@@ -70,3 +77,8 @@ export default class Register extends Component {
         )
     }
 }
+
+export default connect(
+    state => state.user,
+    {login}
+)(Login)

@@ -11,15 +11,18 @@ import {
     Radio,
     Button
 } from 'antd-mobile'
+import { connect } from "react-redux";
 
 import Logo from './logo'
+import {register} from '../../redux/actions'
+import { Redirect } from 'react-router-dom';
 
-export default class Register extends Component {
+class Register extends Component {
     state = {
         username: '',
         password: '',
         password2: '',
-        type: 'dashen'
+        type: '0'
     }
     // 处理输入框/单选框变化, 收集数据到state
     handleChange = (name, value) => {
@@ -31,15 +34,19 @@ export default class Register extends Component {
     }
     // 注册
     register = () => {
-        console.log(JSON.stringify(this.state))
+        this.props.register(this.state)
     }
 
     render() {
-        const {type} = this.state
+        const {redirectTo, msg} = this.props
+        if (redirectTo) {
+            return <Redirect to={redirectTo} />
+        }
         return (
             <div>
                 <NavBar>直&nbsp;聘&nbsp;聊&nbsp;天</NavBar>
                 <Logo></Logo>
+                {msg? <p className="error-msg">{msg}</p> : null }
                 <WingBlank>
                 <List>
                 <InputItem
@@ -68,11 +75,11 @@ export default class Register extends Component {
                 <WhiteSpace/>
                 <List.Item>
                     <span style={{marginRight: 30}}>用户类型:</span>
-                    <Radio checked={this.state.type==='dashen'}
-                    onClick={() => {this.handleChange('type', 'dashen')}}>求职</Radio>
+                    <Radio checked={this.state.type==='0'}
+                    onClick={() => {this.handleChange('type', '0')}}>求职</Radio>
                     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    <Radio checked={this.state.type==='laoban'}
-                    onClick={() => {this.handleChange('type', 'laoban')}}>招聘</Radio>
+                    <Radio checked={this.state.type==='1'}
+                    onClick={() => {this.handleChange('type', '1')}}>招聘</Radio>
                 </List.Item>
 
                 <WhiteSpace/>
@@ -87,3 +94,8 @@ export default class Register extends Component {
         )
     }
 }
+
+export default connect(
+    state => state.user,
+    {register}
+)(Register)

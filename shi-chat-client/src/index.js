@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import {HashRouter, Switch, Route} from 'react-router-dom'
 
+import './assets/css/index.css'
 import store from './redux/store'
 import Login from '../src/components/home/login'
 import Register from '../src/components/home/register'

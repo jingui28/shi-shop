@@ -32,19 +32,44 @@ router.post('/register', function(req, res) {
       })
     }
   })
-
-  router.post('/login', function(req, res) {
-    const {username, password} = req.body
-    UserModel.findOne({username, password: md5(password)}, filter, function(err, user) {
-      if (user) {
-        res.cookie('userid', user._id, {maxAge: 1000*60*60*24*7})
-        res.send({code: 0, data: user})
-      } else {
-        res.send({code: 1, msg: '用户名或密码错误'})
-      }
-    })
-    
-  })
 });
 
+router.post('/login', function(req, res) {
+  const {username, password} = req.body
+  UserModel.findOne({username, password: md5(password)}, filter, function(err, user) {
+    if (user) {
+      res.cookie('userid', user._id, {maxAge: 1000*60*60*24*7})
+      res.send({code: 0, data: user})
+    } else {
+      res.send({code: 1, msg: '用户名或密码错误'})
+    }
+  })
+  
+})
+
+router.post('/update', function(req, res){
+  // 得到请求cookie 的userid
+  const userid = req.cookies.userid
+  // 如果没有, 说明没有登陆, 直接返回提示
+  if (!userid) {
+    res.send({code: 1, msg: '请先登录！'})
+  }
+  // 如果有， 更新数据库中对应的数据
+  UserModel.findByIdAndUpdate({_id: userid}, req.body, function(err, user){
+    const {_id, username, type} = user    // user是数据库中原来的数据
+    const data = Object.assign(req.body, {_id, username, type})   // assign(obj1, obj2, obj3,...) // 将多个指定的对象进行合并, 返回一个合并后的对象
+    res.send({code: 0, data})
+  })
+})
+
+// 根据cookie 获取对应的user
+router.get('/user', function (req, res) {
+  const userid = req.cookies.userid
+  if (!userid) {
+    res.send({code: 1, msg: '请先登录！'})
+  }
+  UserModel.findOne({_id: userid}, filter, function(err, user){
+    res.send({code: 0, data: user})
+  })
+})
 module.exports = router;
