@@ -10,7 +10,7 @@ RESET_USER
 
 import {
 reqRegister,
-reqLogin, reqUpdateUser
+reqLogin, reqUpdateUser, reqUser
 } from '../api'
 
 const authSuccess = (user) => ({type: AUTH_SUCCESS, data: user})      // 同步成功响应
@@ -65,9 +65,23 @@ export function login({username, password}) {
 异步更新用户
 */
 export function updateUser(user){
-    console.log(user);
     return async dispatch => {
         const response = await reqUpdateUser(user)
+        const result = response.data
+        if (result.code === 0) {
+            dispatch(receiveUser(result.data))
+        }else{
+            dispatch(resetUser(result.msg))
+        }
+    }
+}
+
+/*
+异步获取用户
+*/
+export const getUser = () => {
+    return async dispatch => {
+        const response = await reqUser()
         const result = response.data
         if (result.code === 0) {
             dispatch(receiveUser(result.data))
