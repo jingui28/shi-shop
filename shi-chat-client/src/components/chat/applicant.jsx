@@ -1,18 +1,25 @@
-import React, { Component } from 'react'
+/*
+Applicant的主路由组件
+*/
+import React from 'react'
+import {connect} from 'react-redux'
 
-export default class Applicant extends Component {
-    constructor(props) {
-        super(props)
-        this.state = {
+import {getUserList} from '../../redux/actions'
+import UserList from './user-list'
 
-        }
+class Applicant extends React.Component {
+
+    componentDidMount() {
+        this.props.getUserList('1')
     }
 
     render() {
-        return (
-            <div>
-Applicant
-            </div>
-        )
+        return <UserList userList={this.props.userList}></UserList>
     }
+
 }
+
+export default connect(
+    state => ({userList: state.userList}),
+    {getUserList}
+)(Applicant)

@@ -5,18 +5,23 @@ import {
 AUTH_SUCCESS,
 ERROR_MSG,
 RECEIVE_USER,
-RESET_USER
+RESET_USER,
+RECEIVE_USER_LIST
 } from './action-types'
 
 import {
 reqRegister,
-reqLogin, reqUpdateUser
+reqLogin, 
+reqUpdateUser,
+reqGetUser,
+reqUserList
 } from '../api'
 
 const authSuccess = (user) => ({type: AUTH_SUCCESS, data: user})      // 同步成功响应
 const errorMsg = (msg) => ({type: ERROR_MSG, data: msg})        // 同步错误消息
 const receiveUser = (user) => ({type: RECEIVE_USER, data: user})        // 同步接收用户
-const resetUser = (msg) => ({type: RESET_USER, data: msg})      // 同步重置用户
+export const resetUser = (msg) => ({type: RESET_USER, data: msg})      // 同步重置用户
+const receiveUserList = (users) => ({type: RECEIVE_USER_LIST, data: users})     //同步获取用户列表
 
 /*
 异步注册
@@ -65,7 +70,6 @@ export function login({username, password}) {
 异步更新用户
 */
 export function updateUser(user){
-    console.log(user);
     return async dispatch => {
         const response = await reqUpdateUser(user)
         const result = response.data
@@ -73,6 +77,30 @@ export function updateUser(user){
             dispatch(receiveUser(result.data))
         }else{
             dispatch(resetUser(result.msg))
+        }
+    }
+}
+
+// 异步获取用户
+export function getUser(){
+    return async dispatch => {
+        const response = await reqGetUser()
+        const result = response.data
+        if (result.code===0) {
+            dispatch(receiveUser(result.data))
+        } else {
+            dispatch(resetUser(result.msg))
+        }
+    }
+}
+
+// 异步获取用户列表
+export function getUserList(type){
+    return async dispatch => {
+        const response = await reqUserList(type)
+        const result = response.data
+        if (result.code === 0){
+            dispatch(receiveUserList(result.data))
         }
     }
 }

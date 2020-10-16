@@ -25,7 +25,6 @@ router.post('/register', function(req, res) {
       // 2.2. 如果不存在, 将提交的user 保存到数据库
       new UserModel({username, type, password: md5(password)}).save(function(err, user) {
         // 生成一个cookie(userid: user._id), 并交给浏览器保存
-        console.log(user, '---------', err, '*******');
         res.cookie('userid', user._id, {maxAge: 1000*60*60*24*7})   // 持久化cookie, 浏览器会保存在本地文件
         // 3.2. 保存成功, 返回成功的响应数据: user
         res.send({code: 0, data: {_id: user._id, username, type}})   // 返回的数据中不要携带pwd
@@ -72,4 +71,13 @@ router.get('/user', function (req, res) {
     res.send({code: 0, data: user})
   })
 })
+
+// 根据type 获取对应的userList
+router.get('/list', function(req, res){
+  const {type} = req.query
+  UserModel.find({type}, filter, function(err, users){
+    res.send({code: 0, data: users})
+  })
+})
+
 module.exports = router;

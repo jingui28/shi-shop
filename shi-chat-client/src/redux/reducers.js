@@ -7,6 +7,7 @@ import {
 AUTH_SUCCESS,
 ERROR_MSG,
 RECEIVE_USER,
+RECEIVE_USER_LIST,
 RESET_USER
 } from './action-types'
 
@@ -35,7 +36,18 @@ function user(state = initUser, action) {
         
 }
 
+const initUserList = []
+function userList(state = initUserList, action) {
+    switch (action.type) {
+        case RECEIVE_USER_LIST:
+            return action.data
+        default:
+            return state
+    }
+}
+
 // 返回合并后的reducer 函数
 export default combineReducers({
-user
+user,
+userList
 })

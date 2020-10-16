@@ -7,3 +7,5 @@ import ajax from './ajax'
 export const reqLogin = (user) => ajax('/login', user, 'POST')     // 请求登陆
 export const reqRegister = (user) => ajax('/register', user, 'POST')       // 请求注册
 export const reqUpdateUser = (user) => ajax('/update', user, 'POST')        // 更新用户信息
+export const reqGetUser = () => ajax('/user')       // 请求用户信息
+export const reqUserList = (type) => ajax('/list', {type})      // 请求获取用户列表
