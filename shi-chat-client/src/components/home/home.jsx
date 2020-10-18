@@ -1,6 +1,7 @@
 
 import React, {Component} from 'react'
-import { NavLink } from "react-router-dom"
+import { NavLink, Redirect } from "react-router-dom"
+import Cookies from 'js-cookie'
 
 import logo from '../../assets/images/logo/shi.png'
 import chat from '../../assets/images/logo/chat.jpg'
@@ -10,6 +11,11 @@ import '../../assets/style/home.css'
 
 export default class Home extends Component {
     render() {
+        //如果浏览器中没有保存userid 的cookie, 直接跳转到login
+        const userid = Cookies.get('userid')
+       if (userid) {
+           return <Redirect to='/main2' />
+       }
         return (
             <div className="home">
                 <img className="logo" src={logo} alt='logo' />

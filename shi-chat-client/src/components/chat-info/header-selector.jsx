@@ -10,7 +10,7 @@ export default class HeaderSelector extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            icon: ''
+            icon: this.props.header || ''
         }
         this.headerList = []
         for (var i = 0; i < 20; i++) {
@@ -21,14 +21,14 @@ export default class HeaderSelector extends Component {
 
     selectHeader = ({icon, text}) => {
             // 更新当前组件的状态
-            this.setState({icon})
+            this.setState({icon: text})
             // 更新父组件的状态
             this.props.setHeader(text)
         }
 
         render () {
             // 计算头部显示
-            const {icon} = this.state
+            const icon = this.state.icon? require(`../../assets/images/headers/${this.state.icon}.png`) : null
             const gridHeader = icon ? <p>已选择头像: <img src={icon} alt="header"/></p> : '请选择头像'
             return (
                 <List renderHeader={() => gridHeader}>

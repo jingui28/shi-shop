@@ -4,7 +4,7 @@ var router = express.Router();
 // 引入md5 加密函数库
 const md5 = require('blueimp-md5')
 // 引入UserModel
-const {UserModel} = require('../db/models')
+const {UserModel, ChatModel} = require('../db/models')
 
 const filter = {password: 0} // 查询时过滤出指定的属性
 
@@ -25,7 +25,6 @@ router.post('/register', function(req, res) {
       // 2.2. 如果不存在, 将提交的user 保存到数据库
       new UserModel({username, type, password: md5(password)}).save(function(err, user) {
         // 生成一个cookie(userid: user._id), 并交给浏览器保存
-        console.log(user, '---------', err, '*******');
         res.cookie('userid', user._id, {maxAge: 1000*60*60*24*7})   // 持久化cookie, 浏览器会保存在本地文件
         // 3.2. 保存成功, 返回成功的响应数据: user
         res.send({code: 0, data: {_id: user._id, username, type}})   // 返回的数据中不要携带pwd
@@ -72,4 +71,57 @@ router.get('/user', function (req, res) {
     res.send({code: 0, data: user})
   })
 })
+
+// 根据type 获取对应的userList
+router.get('/list', function(req, res){
+  const {type} = req.query
+  UserModel.find({type}, filter, function(err, users){
+    res.send({code: 0, data: users})
+  })
+})
+/*
+获取当前用户所有相关聊天信息列表
+*/
+router.get('/msglist', function (req, res) {
+  // 获取cookie 中的userid
+  const userid = req.cookies.userid
+  // 查询得到所有user 文档数组
+  UserModel.find(function (err, userDocs) {
+    // 用对象存储所有user 信息: key 为user 的_id, val 为name 和header 组成的user 对象
+    const users = {} // 对象容器
+    userDocs.forEach(doc => {
+      users[doc._id] = {username: doc.username, header: doc.header}
+    })
+    /*
+    查询userid 相关的所有聊天信息
+    参数1: 查询条件
+    参数2: 过滤条件
+    参数3: 回调函数
+    */
+    ChatModel.find({'$or': [{from: userid}, {to: userid}]}, filter, function (err, chatMsgs) {
+      // 返回包含所有用户和当前用户相关的所有聊天消息的数据
+      res.send({code: 0, data: {users, chatMsgs}})
+    })
+  })
+})
+/*
+修改指定消息为已读
+*/
+router.post('/readmsg', function (req, res) {
+  // 得到请求中的from 和to
+  const from = req.body.from
+  const to = req.cookies.userid
+  /*
+  更新数据库中的chat 数据
+  参数1: 查询条件
+  参数2: 更新为指定的数据对象
+  参数3: 是否1 次更新多条, 默认只更新一条
+  参数4: 更新完成的回调函数
+  */
+  ChatModel.update({from, to, read: false}, {read: true}, {multi: true}, function (err, doc) {
+    console.log('/readmsg', doc)
+    res.send({code: 0, data: doc.nModified}) // 更新的数量
+  })
+})
+
 module.exports = router;
