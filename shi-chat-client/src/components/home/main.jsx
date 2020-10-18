@@ -17,6 +17,7 @@ import Applicant from '../chat/applicant'
 import Recruit from '../chat/recruit'
 import Message from '../chat/message'
 import Personal from '../chat/personal'
+import Chat from '../chat/chat'
 import NotFound from '../chat/not-found'
 
 class Main extends Component {
@@ -94,6 +95,8 @@ class Main extends Component {
         
             // 得到当前的nav
             const currentNav = this.navList.find(nav => nav.path === pathname)
+            // 得到props 中的unReadCount
+            const unReadCount = this.props.unReadCount<0 ? 0 : this.props.unReadCount
 
         return (
             <div>
@@ -105,15 +108,19 @@ class Main extends Component {
                     <Route path='/recruit' component={Recruit}/>
                     <Route path='/message' component={Message}/>
                     <Route path='/personal' component={Personal}/>
+                    <Route path='/chat/:userid' component={Chat}/>
                     <Route component={NotFound}/>
                 </Switch>
-                {currentNav? <NavFooter unReadCount={this.props.unReadCount} navList={this.navList} /> : null}
+                {currentNav? <NavFooter className='stick-top' unReadCount={unReadCount} navList={this.navList} /> : null}
             </div>
         )
     }
 }
 
 export default connect(
-    state => ({user: state.user}),
+    state => ({
+        user: state.user,
+        unReadCount: state.chat.unReadCount // 未读消息数量
+    }),
     {getUser}
 )(Main)
